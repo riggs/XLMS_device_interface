@@ -1,0 +1,39 @@
+{
+  "name": "XLMS Device Interface",
+  "description": "Interface for XLMS-compatible Task Trainers.",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "app": {
+    "background": {
+      "scripts": [
+        "DI.js",
+        "background.js"
+      ]
+    }
+  },
+  "permissions": [
+    "hid",
+    {"usbDevices": [{"vendorId": 1003, "productId": 8256}]},
+    "storage",
+    "http://xlms.org/",
+    "webview",
+    "audioCapture",
+    "videoCapture"
+  ],
+  "url_handlers": {
+    "training_exercise": {
+      "matches": [
+        "http://xlms.org/exercise/*"
+      ],
+      "title": "Training Exercise"
+    }
+  },
+  "webview": {
+    "partitions": [
+      {
+        "name": "kurento",
+        "accessible_resources": ["*"]
+      }
+    ]
+  }
+}

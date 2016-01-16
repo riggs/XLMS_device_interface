@@ -1,0 +1,27 @@
+{
+  "name": "xlms_device_interface",
+  "version": "0.0.1",
+  "description": "Chrome Application to interface between hardware devices and XLMS.",
+  "main": "background.js",
+  "dependencies": {
+    "kurento-client": "^6.2.0",
+    "kurento-utils": "^6.2.0",
+    "rx": "^4.0.7",
+    "rx-dom": "^7.0.3",
+    "urijs": "^1.17.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riggs/XLMS_device_interface.git"
+  },
+  "author": "riggs@umn.edu",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/riggs/XLMS_device_interface/issues"
+  },
+  "homepage": "https://github.com/riggs/XLMS_device_interface#readme"
+}
