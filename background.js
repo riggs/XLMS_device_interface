@@ -19,13 +19,15 @@ chrome.app.runtime.onLaunched.addListener(launch_data => {
             }
         );
     } else {
-        var storage_items = {};
-        storage_items[DI.launch_data_storage_key] = launch_data;
-        chrome.storage.local.set(storage_items, () => {
-            chrome.app.window.create('interface.html', {
+        chrome.app.window.create(
+            'interface.html',
+            {
                 id: "interface",
                 'outerBounds': {'width': 680, 'height': 480}
-            });
-        });
+            },
+            created_window => {
+                created_window.contentWindow.launch_url = launch_data.url;
+            }
+        );
     }
 });
