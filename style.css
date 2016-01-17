@@ -1,0 +1,29 @@
+.button{
+
+    font-size: 24px;
+    border-radius: 12px;
+    border-color: #5f0114;
+    border-width: 2px;
+    color: #5f0114;
+    background-color: white;
+}
+
+.button:hover{
+
+    color: #ffcc33;
+    background-color: #df0431;
+
+}
+
+.button:disabled{
+
+    color: black;
+    background-color: darkgray;
+
+}
+
+#footer{
+
+    font-size: 10px;
+
+}
