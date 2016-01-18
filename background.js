@@ -5,6 +5,7 @@
 
 
 chrome.app.runtime.onLaunched.addListener(launch_data => {
+    /*
     if (!launch_data.url) {
         console.log("Error: Unknown session");
         chrome.app.window.create(
@@ -19,6 +20,7 @@ chrome.app.runtime.onLaunched.addListener(launch_data => {
             }
         );
     } else {
+    */
         chrome.app.window.create(
             'interface.html',
             {
@@ -29,5 +31,5 @@ chrome.app.runtime.onLaunched.addListener(launch_data => {
                 created_window.contentWindow.launch_url = launch_data.url;
             }
         );
-    }
+    //}
 });

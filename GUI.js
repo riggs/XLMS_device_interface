@@ -4,15 +4,16 @@
 "use strict";
 
 
-var kurento = require("./kurento");
+var kurento = require("./kurento.js");
 
 
 var API = {};
+module.exports = API;
 
 
 var UI = {
     start_button: null,
-    stop_button: null,
+    end_button: null,
     close_button: null,
 };
 API.UI = UI;
@@ -63,10 +64,7 @@ function init () {
         UI[ID] = element;
     }
 
-    kurento.create_window();
+    kurento.create_window(UI);
 
 }
 API.init = init;
-
-
-module.exports = API;

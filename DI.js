@@ -5,9 +5,8 @@
 
 var DI = {
 
-    launch_data_storage_key: "launch_data",
-
-    app_targetOrigin: "chrome://*",     // TODO: Replace with actual app string once finalized.
+    app_targetOrigin: "*",     // TODO: Replace with actual app string once finalized.
+    //app_targetOrigin: "chrome-extension://fpfmfigelfacjdeonglpnkgbilpbopdi",
 
     REST_query_parameter: "endpoint"
 

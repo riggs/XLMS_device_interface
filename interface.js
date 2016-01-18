@@ -5,7 +5,7 @@
 
 var Rx = require("rx");
 require("rx-dom");
-var GUI = require("./GUI");
+var GUI = require("./GUI.js");
 
 
 var session = {
@@ -15,7 +15,7 @@ var session = {
 
 // Retrieve session data.
 function get_session_data () {
-    console.log(lauch_url);
+    console.log("launch_url: " + launch_url);
 }
 
 

@@ -4,11 +4,8 @@
 "use strict";
 
 
-var DI = require("./DI");
-var GUI = require("./GUI");
-
-
 var API = {};
+module.exports = API;
 
 
 API.set_URIs = function(URIs) {
@@ -18,52 +15,19 @@ API.set_URIs = function(URIs) {
 };
 
 
-function create_window () {
-    var this_window = chrome.app.window.current();
-
+function create_window (UI) {
+    console.log("creating wrapper: " + Date.now());
     chrome.app.window.create(
         'kurento_wrapper.html',
+        {
+            id: 'kurento',
+            'outerBounds': {'width': 640, 'height': 768}
+        },
         created_window => {
-            var kurento_window = API.kurento_window = created_window.contentWindow;
-
-            kurento_window.addEventListener('load', () => {
-                var webview =  document.getElementById("webview");
-
-                webview.addEventListener('permissionrequest', event => {
-                    console.log(event);
-                    if (event.permission === 'media') {
-                        event.request.allow();
-                    }
-                });
-
-                webview.addEventListener('contentload', () => {
-                    var postMessage = webview.contentWindow.postMessage;
-
-                    // Set up plumbing so webview gets messages when buttons clicked.
-                    GUI.UI.start_button.addEventListener('click', () => {
-                        postMessage({name: "start_recording"}, DI.app_targetOrigin);
-                    });
-
-                    GUI.UI.stop_button.addEventListener('click', () => {
-                        postMessage({name: "stop_recording"}, DI.app_targetOrigin);
-                    });
-
-                    this_window.onClosed.addListener(() => {
-                        postMessage({name: "stop_recording"}, DI.app_targetOrigin);
-                        setTimeout(created_window.close, 100);
-                    });
-
-                    API.set_URIs = function(URIs) {
-                        postMessage({name: "file_uri", value: URIs.file_uri}, DI.app_targetOrigin);
-                        postMessage({name: "ws_uri", value: URIs.ws_uri}, DI.app_targetOrigin);
-                    };
-                });
-
-            });
+            API.wrapper = created_window.contentWindow;
+            API.wrapper.UI = UI;
+            API.wrapper.main_window = chrome.app.window.current();
         }
     )
 }
-APi.create_window = create_window;
-
-
-module.exports = API;
+API.create_window = create_window;
