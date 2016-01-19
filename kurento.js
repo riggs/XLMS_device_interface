@@ -20,9 +20,15 @@ API.create_window = function (UI) {
             'outerBounds': {'width': 640, 'height': 540}
         },
         wrapper => {
-            wrapper.contentWindow.addEventListener('load', () => {
+            wrapper.contentWindow.main_window = chrome.app.window.current();
+            wrapper.contentWindow.UI = UI;
+            wrapper.contentWindow.API = API;
+
+            /*
+             var wrapper_window = wrapper.contentWindow;
+            wrapper_window.addEventListener('load', () => {
                 console.log("created wrapper: " + Date.now());
-                var webview =  wrapper.contentWindow.document.getElementById("webview");
+                var webview =  wrapper_window.document.getElementById("webview");
 
                 webview.addEventListener('permissionrequest', event => {
                     console.log(event);
@@ -44,10 +50,8 @@ API.create_window = function (UI) {
                         webview_window.postMessage({name: "stop_recording"}, DI.app_targetOrigin);
                     });
 
-                    chrome.app.window.current().onClosed.addListener(() => {
-                        webview_window.postMessage({name: "stop_recording"}, DI.app_targetOrigin);
-                        setTimeout(wrapper.close, 500);
-                    });
+                    wrapper_window.main_window = chrome.app.window.current();
+                    wrapper_window.webview_window = webview_window;
 
                     API.set_URIs = function (URIs) {
                         webview_window.postMessage({name: "file_uri", value: URIs.file_uri}, DI.app_targetOrigin);
@@ -55,6 +59,7 @@ API.create_window = function (UI) {
                     };
                 });
             });
+            */
         }
     )
 };
