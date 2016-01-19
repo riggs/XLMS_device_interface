@@ -20,13 +20,6 @@ API.create_window = function (UI) {
             'outerBounds': {'width': 640, 'height': 768}
         },
         kurento_wrapper => {
-            /*
-            API.wrapper = created_window.contentWindow;
-            API.wrapper.UI = UI;
-            API.wrapper.main_window = chrome.app.window.current();
-            */
-            var main_window = chrome.app.window.current();
-
             kurento_wrapper.contentWindow.addEventListener('load', () => {
                 console.log("created wrapper: " + Date.now());
                 var webview =  kurento_wrapper.contentWindow.document.getElementById("webview");
@@ -51,9 +44,9 @@ API.create_window = function (UI) {
                         webview_window.postMessage({name: "stop_recording"}, DI.app_targetOrigin);
                     });
 
-                    main_window.onClosed.addListener(() => {
+                    chrome.app.window.current().onClosed.addListener(() => {
                         webview_window.postMessage({name: "stop_recording"}, DI.app_targetOrigin);
-                        setTimeout(() => kurento_wrapper.close(), 500);
+                        setTimeout(() => { kurento_wrapper.close(); }, 500);
                     });
 
                     API.set_URIs = function (URIs) {

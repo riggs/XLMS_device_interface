@@ -18,10 +18,19 @@ var session = {
 };
 
 
+function set_URIs(URIs) {
+    if (typeof kurento.set_URIs === "undefined") {
+        setTimeout(() => set_URIs(URIs), 100);
+        console.log("waiting");
+    } else {
+        kurento.set_URIs(URIs);
+    }
+}
+
 // Retrieve session data.
 function get_session_data() {
     console.log("launch_url: " + launch_url);
-    kurento.set_URIs(session.kurento_URIs);
+    set_URIs(session.kurento_URIs);
 }
 
 
