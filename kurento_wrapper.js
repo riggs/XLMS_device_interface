@@ -20,32 +20,28 @@ window.addEventListener('load', () => {
         }
     });
 
-    webview.addEventListener('contentload', () => {
-        console.log("contentload in wrapper: " + Date.now());
-        var postMessage = kurento.postMessage = webview.contentWindow.postMessage;
-        function _postMessage (message, origin) {
-            console.log(message);
-            console.log(origin);
-            postMessage(message, origin);
-        }
+    webview.addEventListener('loadstop', () => {
+        console.log("loadstop in webview: " + Date.now());
+        var _webview = kurento.webview = webview.contentWindow;
 
         // Set up plumbing so webview gets messages when buttons clicked.
         UI.start_button.addEventListener('click', () => {
-            _postMessage({name: "start_recording"}, DI.app_targetOrigin);
+            _webview.postMessage({name: "start_recording"}, DI.app_targetOrigin);
         });
 
         UI.end_button.addEventListener('click', () => {
-            _postMessage({name: "stop_recording"}, DI.app_targetOrigin);
+            _webview.postMessage({name: "stop_recording"}, DI.app_targetOrigin);
         });
 
         main_window.onClosed.addListener(() => {
-            _postMessage({name: "stop_recording"}, DI.app_targetOrigin);
+            _webview.postMessage({name: "stop_recording"}, DI.app_targetOrigin);
             setTimeout(() => chrome.app.window.current().close(), 100);
         });
 
         kurento.set_URIs = function(URIs) {
-            postMessage({name: "file_uri", value: URIs.file_uri}, DI.app_targetOrigin);
-            postMessage({name: "ws_uri", value: URIs.ws_uri}, DI.app_targetOrigin);
+            console.log(URIs);
+            _webview.postMessage({name: "file_uri", value: URIs.file_uri}, DI.app_targetOrigin);
+            _webview.postMessage({name: "ws_uri", value: URIs.ws_uri}, DI.app_targetOrigin);
         };
     });
 

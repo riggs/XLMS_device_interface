@@ -11,6 +11,7 @@ module.exports = API;
 API.set_URIs = function(URIs) {
     // Dummy function to get replaced once the webview has properly loaded.
     // If called prior to being replaced, call again with the same parameters.
+    console.log("calling again: " + URIs);
     setTimeout(() => API.set_URIs(URIs), 0)
 };
 

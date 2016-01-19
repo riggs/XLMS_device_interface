@@ -8,6 +8,6 @@ window.addEventListener('load', () => {
     console.log(Date.now());
     window.addEventListener('message', message => {
         console.log(Date.now());
-        console.log(message);
+        console.log(message.data);
     });
 });
