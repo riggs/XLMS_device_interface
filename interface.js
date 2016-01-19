@@ -3,8 +3,12 @@
  */
 "use strict";
 
+// Libraries.
 var Rx = require("rx");
 require("rx-dom");
+
+// Local files.
+var DI = require("./DI.js");
 var GUI = require("./GUI.js");
 var kurento = require("./kurento.js");
 
@@ -15,7 +19,7 @@ var session = {
 
 
 // Retrieve session data.
-function get_session_data () {
+function get_session_data() {
     console.log("launch_url: " + launch_url);
     kurento.set_URIs(session.kurento_URIs);
 }

@@ -19,24 +19,22 @@ var UI = {
 API.UI = UI;
 
 
-function disable(button) {
+API.disable = function (button) {
     button.disabled = true;
-}
-API.disable = disable;
+};
 
 
-function enable(button) {
+API.enable = function (button) {
     button.disabled = false;
-}
-API.enable = enable;
+};
 
 
-function Error_Window (message) {
+API.Error_Window = function (message) {
 
     var this_window = chrome.app.window.current();
 
-    disable(UI.start_button);
-    enable(UI.close_button);
+    API.disable(UI.start_button);
+    API.enable(UI.close_button);
 
     chrome.app.window.create(
         'error.html',
@@ -50,11 +48,10 @@ function Error_Window (message) {
             this_window.onClosed.addListener(() => { created_window.close(); });
         }
     );
-}
-API.Error_Window = Error_Window;
+};
 
 
-function init () {
+API.init = function () {
 
     for (var ID in UI) {
         var element = document.getElementById(ID);
@@ -66,5 +63,4 @@ function init () {
 
     kurento.create_window(UI);
 
-}
-API.init = init;
+};

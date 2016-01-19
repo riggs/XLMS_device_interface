@@ -4,19 +4,14 @@
 "use strict";
 
 
+var DI = require("./DI.js");
+
+
 var API = {};
 module.exports = API;
 
 
-API.set_URIs = function(URIs) {
-    // Dummy function to get replaced once the webview has properly loaded.
-    // If called prior to being replaced, call again with the same parameters.
-    console.log("calling again: " + URIs);
-    setTimeout(() => API.set_URIs(URIs), 0)
-};
-
-
-function create_window (UI) {
+API.create_window = function (UI) {
     console.log("creating wrapper: " + Date.now());
     chrome.app.window.create(
         'kurento_wrapper.html',
@@ -24,11 +19,49 @@ function create_window (UI) {
             id: 'kurento',
             'outerBounds': {'width': 640, 'height': 768}
         },
-        created_window => {
+        kurento_wrapper => {
+            /*
             API.wrapper = created_window.contentWindow;
             API.wrapper.UI = UI;
             API.wrapper.main_window = chrome.app.window.current();
+            */
+            var main_window = chrome.app.window.current();
+
+            kurento_wrapper.contentWindow.addEventListener('load', () => {
+                console.log("created wrapper: " + Date.now());
+                var webview =  kurento_wrapper.contentWindow.document.getElementById("webview");
+
+                webview.addEventListener('permissionrequest', event => {
+                    console.log(event);
+                    if (event.permission === 'media') {
+                        event.request.allow();
+                    }
+                });
+
+                webview.addEventListener('loadstop', () => {
+                    console.log("loadstop in webview: " + Date.now());
+                    var webview_window = webview.contentWindow;
+
+                    // Set up plumbing so webview gets messages when buttons clicked.
+                    UI.start_button.addEventListener('click', () => {
+                        webview_window.postMessage({name: "start_recording"}, DI.app_targetOrigin);
+                    });
+
+                    UI.end_button.addEventListener('click', () => {
+                        webview_window.postMessage({name: "stop_recording"}, DI.app_targetOrigin);
+                    });
+
+                    main_window.onClosed.addListener(() => {
+                        webview_window.postMessage({name: "stop_recording"}, DI.app_targetOrigin);
+                        setTimeout(() => kurento_wrapper.close(), 500);
+                    });
+
+                    API.set_URIs = function (URIs) {
+                        webview_window.postMessage({name: "file_uri", value: URIs.file_uri}, DI.app_targetOrigin);
+                        webview_window.postMessage({name: "ws_uri", value: URIs.ws_uri}, DI.app_targetOrigin);
+                    };
+                });
+            });
         }
     )
-}
-API.create_window = create_window;
+};
