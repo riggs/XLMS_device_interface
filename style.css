@@ -1,3 +1,11 @@
+body {
+    margin: 5px;
+}
+
+.no_margin {
+    margin: 0px;
+}
+
 .button{
 
     font-size: 24px;
@@ -20,6 +28,11 @@
     color: black;
     background-color: darkgray;
 
+}
+
+#webview {
+    width: 640px;
+    height: 600px;
 }
 
 #footer{

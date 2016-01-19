@@ -17,12 +17,12 @@ API.create_window = function (UI) {
         'kurento_wrapper.html',
         {
             id: 'kurento',
-            'outerBounds': {'width': 640, 'height': 768}
+            'outerBounds': {'width': 640, 'height': 540}
         },
-        kurento_wrapper => {
-            kurento_wrapper.contentWindow.addEventListener('load', () => {
+        wrapper => {
+            wrapper.contentWindow.addEventListener('load', () => {
                 console.log("created wrapper: " + Date.now());
-                var webview =  kurento_wrapper.contentWindow.document.getElementById("webview");
+                var webview =  wrapper.contentWindow.document.getElementById("webview");
 
                 webview.addEventListener('permissionrequest', event => {
                     console.log(event);
@@ -46,7 +46,7 @@ API.create_window = function (UI) {
 
                     chrome.app.window.current().onClosed.addListener(() => {
                         webview_window.postMessage({name: "stop_recording"}, DI.app_targetOrigin);
-                        setTimeout(() => { kurento_wrapper.close(); }, 500);
+                        setTimeout(wrapper.close, 500);
                     });
 
                     API.set_URIs = function (URIs) {
