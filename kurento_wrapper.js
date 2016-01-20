@@ -33,12 +33,11 @@ window.addEventListener('load', () => {
 
         main_window.onClosed.addListener(() => {
             webview_window.postMessage({name: "stop_recording"}, DI.app_targetOrigin);
-            setTimeout(close, 1000);
+            setTimeout(close, 500);
         });
 
         API.set_URIs = function (URIs) {
-            webview_window.postMessage({name: "file_uri", value: URIs.file_uri}, DI.app_targetOrigin);
-            webview_window.postMessage({name: "ws_uri", value: URIs.ws_uri}, DI.app_targetOrigin);
+            webview_window.postMessage({name: "URIs", value: URIs}, DI.app_targetOrigin);
         };
     });
 });

@@ -30,7 +30,10 @@ function set_URIs(URIs) {
 // Retrieve session data.
 function get_session_data() {
     console.log("launch_url: " + launch_url);
-    set_URIs(session.kurento_URIs);
+
+    // TODO: Rest call to get session parameters.
+
+    set_URIs(session.kurento_URIs);     // FIXME: Temporary test.
 }
 
 
