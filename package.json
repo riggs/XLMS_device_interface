@@ -8,6 +8,7 @@
     "kurento-utils": "^6.2.0",
     "rx": "^4.0.7",
     "rx-dom": "^7.0.3",
+    "text-encoding": "^0.5.2",
     "urijs": "^1.17.0",
     "webrtc-adapter-test": "^0.2.7"
   },

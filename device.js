@@ -5,6 +5,7 @@
 
 
 var Rx = require("rx");
+var TextDecoder = require("text-encoding").TextDecoder;
 
 
 var DI = require("./DI.js");
@@ -28,10 +29,54 @@ var report_type_masks = {
 };
 
 
-function parse_admin_report (buffer) {
+function get_parser (type, offset, length) {
+    switch (type) {
+        case 0b00:  // UTF-8
+            return dataview => TextDecoder('utf-8').decode(new Uint8Array(dataview.buffer, offset, length));
+        case 0b01:  // Int
+            switch (length) {
+                case 1:
+                    return dataview => dataview.getInt8(offset);
+                case 2:
+                    return dataview => dataview.getInt16(offset);
+                case 4:
+                    return dataview => dataview.getInt32(offset);
+                case 8:
+                    return dataview => dataview.getInt32(offset) << 32 + dataview.getInt32(offset + 4);
+                default:
+                    return dataview => utils.hex_parser(dataview.buffer, offset, length);
+            }
+        case 0b10:  // UInt
+            switch (length) {
+                case 1:
+                    return dataview => dataview.getUint8(offset);
+                case 2:
+                    return dataview => dataview.getUint16(offset);
+                case 4:
+                    return dataview => dataview.getUint32(offset);
+                case 8:
+                    return dataview => dataview.getUint32(offset) << 32 + dataview.getUint32(offset + 4);
+                default:
+                    return dataview => utils.hex_parser(dataview.buffer, offset, length);
+            }
+        case 0b11:  // Float
+            switch (length) {
+                case 4:
+                    return dataview => dataview.getFloat32(offset);
+                case 8:
+                    return dataview => dataview.getFloat64(offset);
+                default:
+                    return dataview => utils.hex_parser(dataview.buffer, offset, length);
+            }
+        default:
+            return dataview => utils.hex_parser(dataview.buffer, offset, length);
+   }
+}
 
-    var buffer_length = buffer.byteLength;
-    var dataview = new DataView(buffer);
+
+function parse_admin_report (dataview) {
+
+    var buffer_length = dataview.byteLength;
 
     var report_offset = 0;
 
@@ -39,12 +84,12 @@ function parse_admin_report (buffer) {
 
     while (report_offset < buffer_length) {
 
-        var report_length = dataview.getUint8(0 + report_offset);
+        var report_length = dataview.getUint8(report_offset);
 
-        var report_ID = dataview.getUint8(1 + report_offset);
+        var report_ID = dataview.getUint8(report_offset + 1);
         var schema = report_schemas[report_ID] || {};
 
-        var report_types = dataview.getUint8(2 + report_offset);
+        var report_types = dataview.getUint8(report_offset + 2);
 
         var parser_functions = [];
 
@@ -54,15 +99,21 @@ function parse_admin_report (buffer) {
             }
         }
 
-        var report_name_length = dataview.getUint8(3 + report_offset);
+        var report_name_length = dataview.getUint8(report_offset + 3);
 
-        // FIXME: Build name string from UTF-8 bytes.
-        var report_name = schema.name = '';
+        schema.name = TextDecoder('utf-8').decode(
+            new Uint8Array(dataview.buffer, report_offset + 4, report_name_length)
+        );
 
-        var byte_offset = 5 + report_offset + report_name_length;
+        var data_byte_offset = 0;    // Byte offset for data to be parsed.
+        for (var i = 4 + report_offset + report_name_length + 1; i < report_offset + report_length; ++i) {
+            var byte = dataview.getUint8(i);
+            var data_type = 0b11 & byte;
+            var data_length = byte >> 2;
 
-        while (byte_offset < report_offset + report_length) {
+            parser_functions.push(get_parser(data_type, data_byte_offset, data_length));
 
+            data_byte_offset += data_length;
         }
 
         report_schemas[report_ID] = schema;
@@ -78,6 +129,7 @@ function build_reports (connection_ID) {
 
     // TODO: Connect to device and retrieve serialization report.
 
+    // TODO: Create DataView of buffer from report and pass it to parse_admin_report.
 
 }
 

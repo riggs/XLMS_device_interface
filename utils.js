@@ -8,11 +8,9 @@ var API = {};
 module.exports = API;
 
 
-API.hex_parser = function (buffer) {
-    return Array.from(new Uint32Array(buffer))
-        .map(function (i) {
-            return Number.prototype.toString.call(i, 16).toUpperCase();
-        })
+API.hex_parser = function (buffer, byteOffset, length) {
+    return Array.from(new Uint8Array(buffer, byteOffset, length))
+        .map(i => Number.prototype.toString.call(i, 16).toUpperCase())
         .toString();
 };
 
