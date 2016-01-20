@@ -13,7 +13,11 @@ module.exports = API;
 
 
 function parse_admin_report (buffer) {
+    var dataview = new DataView(buffer);
 
+    var report_length = dataview.getUint8(0);
+
+    var report_ID = dataview.getUint8(1);
 }
 
 
@@ -30,6 +34,9 @@ function build_reports (connection_ID) {
 
 
 API.init = function () {
+
+    // TODO: Get devices.
+
 
 
 };
