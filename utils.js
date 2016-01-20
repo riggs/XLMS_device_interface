@@ -5,16 +5,14 @@
 
 
 var API = {};
+module.exports = API;
 
 
-function hex_parser(buffer) {
+API.hex_parser = function (buffer) {
     return Array.from(new Uint32Array(buffer))
         .map(function (i) {
             return Number.prototype.toString.call(i, 16).toUpperCase();
         })
         .toString();
-}
-API.hex_parser = hex_parser;
+};
 
-
-module.exports = API;
