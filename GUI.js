@@ -12,6 +12,7 @@ module.exports = API;
 
 
 var UI = {
+    exercise_name: null,
     start_button: null,
     end_button: null,
     close_button: null,
@@ -51,7 +52,7 @@ API.Error_Window = function (message) {
 };
 
 
-API.init = function () {
+API.init = function (session_data) {
 
     for (var ID in UI) {
         var element = document.getElementById(ID);
