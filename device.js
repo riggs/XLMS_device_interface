@@ -91,19 +91,19 @@ function parse_admin_report (dataview) {
 
         var report_types = dataview.getUint8(report_offset + 2);
 
+        var report_name_length = dataview.getUint8(report_offset + 3);
+
+        var schema_name = TextDecoder('utf-8').decode(
+            new Uint8Array(dataview.buffer, report_offset + 4, report_name_length)
+        );
+
         var parser_functions = [];
 
         for (var mask in report_type_masks) {
             if (mask & report_types) {
-                schema[report_type_masks[mask]] = parser_functions;
+                schema[report_type_masks[mask]] = {name: schema_name, parsers: parser_functions};
             }
         }
-
-        var report_name_length = dataview.getUint8(report_offset + 3);
-
-        schema.name = TextDecoder('utf-8').decode(
-            new Uint8Array(dataview.buffer, report_offset + 4, report_name_length)
-        );
 
         var data_byte_offset = 0;    // Byte offset for data to be parsed.
         for (var i = 4 + report_offset + report_name_length + 1; i < report_offset + report_length; ++i) {
