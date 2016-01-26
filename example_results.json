@@ -1,0 +1,48 @@
+{
+  "session": 123456,
+  "device": "serial number or maybe some json object, or long string of manikin parts",
+  "start_time": 1453846123,
+  "elapsed_time": 42,
+  "events": [
+    {"event": 0, "value": "Hi mom!"},
+    {"1": 1},
+    "foo",
+    {"I still don't know how events will be formatted": "but they will still be a list of something."},
+    42
+  ],
+  "success": 0.8652559794322651,
+  "configuration": {
+    "sequence": [
+      "left",
+      "right",
+      "center"
+    ],
+  },
+  "metrics": {
+    "times_patient_died": {
+      "maximum": "3",
+      "minimum": "1"
+    },
+    "trachea": {
+      "minimum": "1",
+      "maximum": "3"
+    },
+    "drop_errors": {
+      "maximum": 0
+    },
+    "list_of_stuff": {
+      "drummers": 12,
+      "pipers": 11,
+      "lords": 10,
+      "ladies": 9,
+      "maids": 8,
+      "swans": 7,
+      "geese": 6,
+      "gooooo-oooooooold_riiiiiiiiiiings": 5,
+      "more_birds": 4,
+      "still_more_birds": 3,
+      "two_stupid_birds": 2,
+      "tree": 1
+    }
+  }
+}
