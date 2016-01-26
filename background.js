@@ -22,7 +22,7 @@ chrome.app.runtime.onLaunched.addListener(launch_data => {
     } else {
     */
         chrome.app.window.create(
-            'interface.html',
+            'interface_wrapper.html',
             {
                 id: "interface",
                 'outerBounds': {'width': 680, 'height': 480}

@@ -62,9 +62,7 @@ function get_session_data() {
 
     set_URIs(session.kurento_URIs);     // FIXME: Temporary test.
 
-    // TODO: REST request to get GUI code.
-
-    // TODO: REST request to get Evaluation code.
+    // TODO: REST request to get device interface from XLMS.
 
 }
 

@@ -6,7 +6,7 @@
 
   <title>XLMS Device Interface</title>
 
-  <script type="text/javascript" src="build/interface.js"></script>
+  <script type="text/javascript" src="build/interface_wrapper.js"></script>
 
 </head>
 <body>
@@ -14,6 +14,8 @@
 <header>
   <h2 id="exercise_name">Exercise</h2>
 </header>
+
+<webview id="interface_webview" class="no_margin" src="GUI_webview_placeholder.html" autosize="on" partition="GUI"></webview>
 
 <div id="buttons">
   <button class="button" id="start_button">Start Exercise</button>

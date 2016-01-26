@@ -7,17 +7,16 @@
 var kurento = require("./kurento.js");
 
 
-var API = {};
-module.exports = API;
+var API = module.exports = {};
 
 
-var UI = {
+var UI = API.UI = {
+    interface_webview: null,
     exercise_name: null,
     start_button: null,
     end_button: null,
     close_button: null,
 };
-API.UI = UI;
 
 
 API.disable = function (button) {
@@ -63,5 +62,22 @@ API.init = function (session_data) {
     }
 
     kurento.create_window(UI);
+
+    // FIXME: use actual interface value as obtained from YAML.
+    UI.interface_webview.src = session_data.interface;
+
+    UI.interface_webview.addEventListener('loadstop', () => {
+        var webview_window = UI.interface_webview.contentWindow;
+
+        webview_window.postMessage({name: "session", value: session_data}, DI.app_targetOrigin);
+
+        UI.start_button.addEventListener('click', () => {
+            webview_window.postMessage({name: "start_exercise"}, DI.app_targetOrigin);
+        });
+
+        UI.end_button.addEventListener('click', () => {
+            webview_window.postMessage({name: "end_exercise"}, DI.app_targetOrigin);
+        });
+    });
 
 };
