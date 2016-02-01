@@ -33,6 +33,10 @@
       {
         "name": "kurento",
         "accessible_resources": ["*"]
+      },
+      {
+        "name": "GUI",
+        "accessible_resources": ["GUI_webview_placeholder.html"]
       }
     ]
   }

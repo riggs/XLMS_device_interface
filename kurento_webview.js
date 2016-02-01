@@ -4,7 +4,7 @@
 "use strict";
 
 
-require("webrtc-adapter");
+require("webrtc-adapter-test");
 
 
 var file_uri = null;
@@ -46,12 +46,16 @@ window.addEventListener('load', () => {
                 console.log(message.data.value);
                 file_uri = message.data.value.file_uri;
                 ws_uri = message.data.value.ws_uri;
+
+                window.file_uri = file_uri;
+                window.ws_uri = ws_uri;
+
                 break;
 
             case "start_recording":
                 if (!recording) {
 
-                    //stream.getTracks().forEach(track => track.stop());
+                    stream.getTracks().forEach(track => track.stop());
                     video.src = "";
 
                     start_recording();
@@ -82,3 +86,4 @@ window.addEventListener('load', () => {
         });
 
 });
+

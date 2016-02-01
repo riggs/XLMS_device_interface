@@ -5,6 +5,7 @@
 
 
 var kurento = require("./kurento.js");
+var DI = require("./DI.js");
 
 
 var API = module.exports = {};
@@ -73,11 +74,15 @@ API.init = function (session_data) {
 
         UI.start_button.addEventListener('click', () => {
             webview_window.postMessage({name: "start_exercise"}, DI.app_targetOrigin);
+            // TODO: Include function to do other stuff.
         });
 
         UI.end_button.addEventListener('click', () => {
             webview_window.postMessage({name: "end_exercise"}, DI.app_targetOrigin);
+            // TODO: Include function to do other stuff.
         });
+
+        // TODO: close button
     });
 
 };
