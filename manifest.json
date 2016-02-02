@@ -23,7 +23,7 @@
   "url_handlers": {
     "training_exercise": {
       "matches": [
-        "http://xlms.org/exercise/*"
+        "http://xlms.org/exercise*"
       ],
       "title": "Training Exercise"
     }

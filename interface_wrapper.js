@@ -29,8 +29,8 @@ function set_URIs(URIs) {
     }
 }
 
-// Retrieve session data.
-function get_session_data() {
+
+function initialize() {
     console.log("launch_url: " + launch_url);
 
     fetch(URI.parseQuery(URI.parse(launch_url).query)[DI.REST_query_parameter])
@@ -38,40 +38,31 @@ function get_session_data() {
 
         .then(
             data => {
-                // FIXME: Do something with the data.
-                console.log(data);
                 session.rest_values = data;
-                /*
-                 session.session_ID = data.id;
-                 var criteria = {};
-                 data.config.forEach(obj => { criteria[obj.metric] = obj.threshold });
-                 session.criteria = criteria;
-                 UI.exercise_name.innerHTML = "<h2>" + data.course + " " + data.exercise + "</h2>";
-                 for (var item in criteria) {
-                 UI[item + "_criteria"].innerText = criteria[item];
-                 }
-                 */
+                session.session_ID = data.id;
+                session.metrics = data.metrics;
+                session.configuration = data.configuration;
+                session.hardware = data.hardware;
+                session.kurento_URIs.file_uri = "file://" + data.kurento_video_directory + data.id + ".webm";
+                session.kurento_URIs.ws_uri = "ws://" + data.kurento_url;
+                session.course = data.course;
+                session.exercise = data.exercise;
+                session.interface = data.interface;
 
-                set_URIs(session.kurento_URIs);     // FIXME: Temporary test.
+                set_URIs(session.kurento_URIs);
+
+                GUI.init(session);
             },
             error => {
-                if (error.name === "SyntaxError") {
+                if (error instanceof SyntaxError) {
                     GUI.Error_Window("Invalid session data. Please click 'Start lesson' button again.")
                 } else {
+                    console.log(error);
                     throw error;
                 }
             }
         );
 }
-
-
-function initialize() {
-    get_session_data();
-
-    GUI.init(session);
-
-}
-
 
 Rx.DOM.ready().subscribe(initialize);
 

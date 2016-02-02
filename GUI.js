@@ -61,10 +61,10 @@ API.init = function (session_data) {
         }
         UI[ID] = element;
     }
+    UI.exercise_name.innerHTML = "<h2>" + session_data.course + " " + session_data.exercise + "</h2>";
 
     kurento.create_window(UI);
 
-    // FIXME: use actual interface value as obtained from YAML.
     UI.interface_webview.src = session_data.interface;
 
     UI.interface_webview.addEventListener('loadstop', () => {
