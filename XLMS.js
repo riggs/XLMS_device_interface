@@ -5,6 +5,7 @@
 
 
 let URI = require("urijs");
+let DI = require("./DI.js");
 
 
 var API = module.exports = {};
@@ -20,8 +21,16 @@ API.get_session = function (launch_url) {
 
     session.endppoint = URI.parseQuery(URI.parse(launch_url).query)[DI.REST_query_parameter];
 
-    fetch(session.endppoint)
-        .then(response => response.json())
+    return fetch(session.endppoint)
+        .then(response => response.json(),
+            error => {
+                if (error instanceof SyntaxError) {
+                    GUI.Error_Window("Invalid session data. Please click 'Start lesson' button again.")
+                } else {
+                    console.log(error);
+                    throw error;
+                }
+            })
         .then(
             data => {
                 session.rest_values = data;
@@ -36,16 +45,7 @@ API.get_session = function (launch_url) {
                 session.interface = data.interface;
 
                 return session;
-            },
-            error => {
-                if (error instanceof SyntaxError) {
-                    GUI.Error_Window("Invalid session data. Please click 'Start lesson' button again.")
-                } else {
-                    console.log(error);
-                    throw error;
-                }
-            }
-        );
+            });
 };
 
 

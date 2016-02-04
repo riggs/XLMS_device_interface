@@ -8,7 +8,6 @@ var Rx = require("rx");
 require("rx-dom");
 
 // Local files.
-let DI = require("./DI.js");
 let GUI = require("./GUI.js");
 let XLMS = require("./XLMS.js");
 let kurento = require("./kurento.js");
@@ -34,6 +33,7 @@ function launch () {
 
             GUI.init(session);
 
+            window.session = session;
         });
 }
 
@@ -42,4 +42,3 @@ Rx.DOM.ready().subscribe(launch);
 
 
 window.req = req => require(req);
-window.session = session;
