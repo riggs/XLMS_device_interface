@@ -5,8 +5,8 @@
 
 var DI = {
 
-    app_targetOrigin: "*",     // TODO: Grok Origins.
-    //app_targetOrigin: "chrome-extension://fpfmfigelfacjdeonglpnkgbilpbopdi",
+    //app_targetOrigin: "*",     // TODO: Grok Origins.
+    app_targetOrigin: "chrome-extension://fpfmfigelfacjdeonglpnkgbilpbopdi",
 
     REST_query_parameter: "endpoint",
 

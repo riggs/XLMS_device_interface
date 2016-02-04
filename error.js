@@ -6,17 +6,29 @@
 
 window.addEventListener('load', () => {
 
-    document.getElementById("close_button").addEventListener('click', () => {
-        main_window.close();
-        chrome.app.window.current().close();
-    });
+    if (retry) {
+        document.getElementById("retry_button").disabled = false;
 
-    document.getElementById("error_button").addEventListener('click', () => {
-        if (ignore_error) {
-            document.getElementById("error_button").disabled = false;
-            ignore_error();
-        }
-    });
+        document.getElementById("retry_button").addEventListener('click', () => {
+            retry();
+        });
+    }
+
+    if (ignore) {
+        document.getElementById("ignore_button").disabled = false;
+
+        document.getElementById("ignore_button").addEventListener('click', () => {
+            ignore();
+        });
+    }
+
+    if (exit) {
+        document.getElementById("exit_button").disabled = false;
+
+        document.getElementById("exit_button").addEventListener('click', () => {
+            exit();
+        });
+    }
 
     document.getElementById("error_message").innerHTML = error_message;
 

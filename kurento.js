@@ -4,9 +4,6 @@
 "use strict";
 
 
-var DI = require("./DI.js");
-
-
 var API = {};
 module.exports = API;
 
