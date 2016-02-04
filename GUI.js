@@ -30,7 +30,9 @@ API.enable = function (button) {
 };
 
 
-API.Error_Window = function (message, retry_callback, ignore_callback, exit_callback) {
+API.Error_Window = function (message, callbacks) {
+
+    console.log(arguments);
 
     var this_window = chrome.app.window.current();
 
@@ -40,60 +42,50 @@ API.Error_Window = function (message, retry_callback, ignore_callback, exit_call
     chrome.app.window.create(
         'error.html',
         {
-            id: "error",
+            id: "error" + message,
             'outerBounds': {'width': 320, 'height': 160}
         },
         created_window => {
             created_window.contentWindow.error_message = message;
-            created_window.contentWindow.retry = retry_callback;
-            created_window.contentWindow.ignore = ignore_callback;
-            created_window.contentWindow.exit = exit_callback;
+            created_window.contentWindow.retry = callbacks.retry;
+            created_window.contentWindow.ignore = callbacks.ignore;
+            created_window.contentWindow.exit = callbacks.exit;
+            created_window.contentWindow.parent_window = this_window;
             this_window.onClosed.addListener(() => { created_window.close(); });
         }
     );
 };
 
 
-function generate_message_handler (other_window) {
-    let location = document.createElement("a");
-    location.href = other_window.src;
-    let other_window_origin = location.origin;
+function generate_message_handler (other_window, other_window_origin) {
     return message => {
-        switch (message.source) {
-            case other_window:
-                switch (message.data.name) {
-                    case "ready":
-                        API.enable(UI.start_button);
-                        break;
-                    case "error":
-                        let error_types = {
-                            retry: null,
-                            ignore: null,
-                            exit: null
-                        };
-                        message.data.types.forEach(type => {
-                            if (error_types[type] === null) {
-                                error_types[type] = () => {
-                                    other_window.postMessage({
-                                        name: "error_response",
-                                        id: message.data.id,
-                                        error_type: type
-                                    }, other_window_origin);
-                                }
-                            }
-                            API.Error_Window(
-                                message.data.message,
-                                error_types.retry,
-                                error_types.ignore,
-                                error_types.exit
-                            );
-                        });
-                        break;
-                }
+        console.log(message);
+        switch (message.data.name) {
+            case "ready":
+                API.enable(UI.start_button);
+                break;
+            case "error":
+                let error_types = {
+                    retry: null,
+                    ignore: null,
+                    exit: null
+                };
+                message.data.types.forEach(type => {
+                    if (error_types[type] === null) {
+                        error_types[type] = () => {
+                            other_window.postMessage({
+                                name: "error_response",
+                                id: message.data.id,
+                                error_type: type
+                            }, other_window_origin);
+                        }
+                    }
+                });
+                API.Error_Window(message.data.message, error_types);
                 break;
             default:
                 console.log("Unknown message:");
-                console.log(window);
+                console.log(message);
         }
     };
 }
@@ -113,15 +105,14 @@ API.init = function (session_data) {
     kurento.create_window(UI);
 
     let location = document.createElement("a");
-    location.href = UI.interface_webview.src = session_data.interface;
+    UI.interface_webview.src = location.href = session_data.interface;
     let webview_origin = location.origin;
-
-    let message_handler = generate_message_handler(UI.interface_webview);
 
     UI.interface_webview.addEventListener('loadstop', () => {
         var webview_window = UI.interface_webview.contentWindow;
 
-        window.addEventListener('message', message_handler);
+        window.addEventListener('message', generate_message_handler(webview_window, webview_origin));
+
 
         console.log(Date.now() + "sending session data to webview");
         webview_window.postMessage({name: "session", value: session_data}, webview_origin);    // FIXME: Figure out what to do about targetOrigin.
@@ -136,7 +127,7 @@ API.init = function (session_data) {
         UI.end_button.addEventListener('click', () => {
             webview_window.postMessage({name: "end_exercise"}, webview_origin);
             API.enable(UI.start_button);
-            webview_window.postMessage(({name: "results_request"}));
+            webview_window.postMessage({name: "results_request"}, webview_origin);
             // TODO: Include function to do other stuff.
         });
 

@@ -10,7 +10,8 @@ window.addEventListener('load', () => {
         document.getElementById("retry_button").disabled = false;
 
         document.getElementById("retry_button").addEventListener('click', () => {
-            retry();
+            retry.call(parent_window);
+            close();
         });
     }
 
@@ -18,7 +19,8 @@ window.addEventListener('load', () => {
         document.getElementById("ignore_button").disabled = false;
 
         document.getElementById("ignore_button").addEventListener('click', () => {
-            ignore();
+            ignore.call(parent_window);
+            close();
         });
     }
 
@@ -26,7 +28,8 @@ window.addEventListener('load', () => {
         document.getElementById("exit_button").disabled = false;
 
         document.getElementById("exit_button").addEventListener('click', () => {
-            exit();
+            exit.call(parent_window);
+            close();
         });
     }
 
