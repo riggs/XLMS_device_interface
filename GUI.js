@@ -33,8 +33,6 @@ API.enable = function (button) {
 
 API.Error_Window = function (message, callbacks) {
 
-    console.log(arguments);
-
     var this_window = chrome.app.window.current();
 
     API.disable(UI.start_button);
@@ -62,7 +60,6 @@ API.init = function (session_data) {
 
     function generate_message_handler (other_window, other_window_origin) {
         return message => {
-            console.log(message);
             switch (message.data.name) {
                 case "ready":
                     API.enable(UI.start_button);
