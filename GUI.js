@@ -6,6 +6,7 @@
 
 var kurento = require("./kurento.js");
 var DI = require("./DI.js");
+var XLMS = require("./XLMS.js");
 
 
 var API = module.exports = {};
@@ -57,41 +58,44 @@ API.Error_Window = function (message, callbacks) {
 };
 
 
-function generate_message_handler (other_window, other_window_origin) {
-    return message => {
-        console.log(message);
-        switch (message.data.name) {
-            case "ready":
-                API.enable(UI.start_button);
-                break;
-            case "error":
-                let error_types = {
-                    retry: null,
-                    ignore: null,
-                    exit: null
-                };
-                message.data.types.forEach(type => {
-                    if (error_types[type] === null) {
-                        error_types[type] = () => {
-                            other_window.postMessage({
-                                name: "error_response",
-                                id: message.data.id,
-                                error_type: type
-                            }, other_window_origin);
-                        }
-                    }
-                });
-                API.Error_Window(message.data.message, error_types);
-                break;
-            default:
-                console.log("Unknown message:");
-                console.log(message);
-        }
-    };
-}
-
-
 API.init = function (session_data) {
+
+    function generate_message_handler (other_window, other_window_origin) {
+        return message => {
+            console.log(message);
+            switch (message.data.name) {
+                case "ready":
+                    API.enable(UI.start_button);
+                    break;
+                case "error":
+                    let error_types = {
+                        retry: null,
+                        ignore: null,
+                        exit: null
+                    };
+                    message.data.types.forEach(type => {
+                        if (error_types[type] === null) {
+                            error_types[type] = () => {
+                                other_window.postMessage({
+                                    name: "error_response",
+                                    id: message.data.id,
+                                    error_type: type
+                                }, other_window_origin);
+                            }
+                        }
+                    });
+                    API.Error_Window(message.data.message, error_types);
+                    break;
+                case "results":
+                    session_data.results = message.data.results;
+                    XLMS.send_results(message.data.results);
+                    break;
+                default:
+                    console.log("Unknown message:");
+                    console.log(message);
+            }
+        };
+    }
 
     for (var ID in UI) {
         var element = document.getElementById(ID);
@@ -112,7 +116,6 @@ API.init = function (session_data) {
         var webview_window = UI.interface_webview.contentWindow;
 
         window.addEventListener('message', generate_message_handler(webview_window, webview_origin));
-
 
         console.log(Date.now() + "sending session data to webview");
         webview_window.postMessage({name: "session", value: session_data}, webview_origin);    // FIXME: Figure out what to do about targetOrigin.
