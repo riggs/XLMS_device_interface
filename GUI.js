@@ -30,7 +30,7 @@ API.enable = function (button) {
 };
 
 
-API.Error_Window = function (message) {
+API.Error_Window = function (message, callback) {
 
     var this_window = chrome.app.window.current();
 
@@ -45,7 +45,8 @@ API.Error_Window = function (message) {
         },
         created_window => {
             created_window.contentWindow.error_message = message;
-            created_window.onClosed.addListener(() => { this_window.close(); });
+            created_window.contentWindow.ignore_error = callback;
+            created_window.contentWindow.main_window = this_window;
             this_window.onClosed.addListener(() => { created_window.close(); });
         }
     );
@@ -70,19 +71,33 @@ API.init = function (session_data) {
     UI.interface_webview.addEventListener('loadstop', () => {
         var webview_window = UI.interface_webview.contentWindow;
 
+        window.addEventListener('message', message => {
+            if (message.source === webview_window && message.data.name === "ready") {
+                API.enable(UI.start_button);
+            }
+        });
+
+        console.log(Date.now() + "sending session data to webview");
         webview_window.postMessage({name: "session", value: session_data}, DI.app_targetOrigin);
 
         UI.start_button.addEventListener('click', () => {
             webview_window.postMessage({name: "start_exercise"}, DI.app_targetOrigin);
+            API.enable(UI.end_button);
+            API.disable(UI.start_button);
             // TODO: Include function to do other stuff.
         });
 
         UI.end_button.addEventListener('click', () => {
             webview_window.postMessage({name: "end_exercise"}, DI.app_targetOrigin);
+            API.enable(UI.start_button);
+            webview_window.postMessage(({name: "results_request"}));
             // TODO: Include function to do other stuff.
         });
 
-        // TODO: close button
+        UI.close_button.addEventListener('click', () => {
+            webview_window.postMessage({name: "end_exercise"}, DI.app_targetOrigin);
+            close();
+        })
     });
 
 };
