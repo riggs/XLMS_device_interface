@@ -19,9 +19,9 @@ var session = {
 
 API.get_session = function (launch_url) {
 
-    session.endppoint = URI.parseQuery(URI.parse(launch_url).query)[DI.REST_query_parameter];
+    session.endpoint = URI.parseQuery(URI.parse(launch_url).query)[DI.REST_query_parameter];
 
-    return fetch(session.endppoint)
+    return fetch(session.endpoint)
         .then(response => response.json(),
             error => {
                 if (error instanceof SyntaxError) {

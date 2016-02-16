@@ -10,7 +10,7 @@ var DI = {
 
     REST_query_parameter: "endpoint",
 
-    admin_report_ID: 41,
+    admin_report_ID: 1,
 
 };
 

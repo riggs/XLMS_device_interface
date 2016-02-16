@@ -6,6 +6,7 @@
 
 var Rx = require("rx");
 var TextDecoder = require("text-encoding").TextDecoder;
+var TextEncoder = require("text-encoding").TextEncoder;
 
 
 var DI = require("./DI.js");
@@ -29,47 +30,118 @@ var report_type_masks = {
 };
 
 
-function get_parser (type, offset, length) {
+let MAX_INT32 = Math.pow(2, 32);
+
+
+function get_encoders_decoders (type, offset, length) {
     switch (type) {
         case 0b00:  // UTF-8
-            return dataview => TextDecoder('utf-8').decode(new Uint8Array(dataview.buffer, offset, length));
+            return [() => console.log("utf8_decode"), () => console.log("utf8_encode")];
+            return [
+                dataview => TextDecoder('utf8').decode(new Uint8Array(dataview.buffer, offset, length)),
+                (dataview, value) => {
+                    (new Uint8Array(dataview.buffer, offset, length)).set(TextEncoder('utf8').encode(value));
+                }
+            ];
         case 0b01:  // Int
             switch (length) {
                 case 1:
-                    return dataview => dataview.getInt8(offset);
+                    return [() => console.log("Int8_decode"), () => console.log("Int8_encode")];
+                    return [
+                        dataview => dataview.getInt8(offset),
+                        (dataview, value) => dataview.setInt8(offset, value)
+                    ];
                 case 2:
-                    return dataview => dataview.getInt16(offset);
+                    return [() => console.log("Int16_decode"), () => console.log("Int16_encode")];
+                    return [
+                        dataview => dataview.getInt16(offset),
+                        (dataview, value) => dataview.setInt16(offset, value)
+                    ];
                 case 4:
-                    return dataview => dataview.getInt32(offset);
+                    return [() => console.log("Int32_decode"), () => console.log("Int32_encode")];
+                    return [
+                        dataview => dataview.getInt32(offset),
+                        (dataview, value) => dataview.setInt32(offset, value)
+                    ];
                 case 8:
-                    return dataview => dataview.getInt32(offset) << 32 + dataview.getInt32(offset + 4);
+                    return [() => console.log("Int64_decode"), () => console.log("Int64_encode")];
+                    return [
+                        dataview => dataview.getInt32(offset) * MAX_INT32 + dataview.getInt32(offset + 4),
+                        (dataview, value) => {
+                            dataview.setInt32(offset, Math.floor(value / MAX_INT32));
+                            dataview.setInt32(offset + 4, value % MAX_INT32);
+                        }
+                    ];
                 default:
-                    return dataview => utils.hex_parser(dataview.buffer, offset, length);
+                    return [() => console.log("Unknown Int: hex_parser"), () => console.log("Unknown Int: hex_writer")];
+                    return [
+                        dataview => utils.hex_parser(dataview.buffer, offset, length),
+                        (dataview, value) => utils.hex_writer(dataview.buffer, offset, value)
+                    ];
             }
         case 0b10:  // UInt
             switch (length) {
                 case 1:
-                    return dataview => dataview.getUint8(offset);
+                    return [() => console.log("Uint8_decode"), () => console.log("Uint8_encode")];
+                    return [
+                        dataview => dataview.getUint8(offset),
+                        (dataview, value) => dataview.setUint8(offset, value)
+                    ];
                 case 2:
-                    return dataview => dataview.getUint16(offset);
+                    return [() => console.log("Uint16_decode"), () => console.log("Uint16_encode")];
+                    return [
+                        dataview => dataview.getUint16(offset),
+                        (dataview, value) => dataview.setUint16(offset, value)
+                    ];
                 case 4:
-                    return dataview => dataview.getUint32(offset);
+                    return [() => console.log("Uint32_decode"), () => console.log("Uint32_encode")];
+                    return [
+                        dataview => dataview.getUint32(offset),
+                        (dataview, value) => dataview.setUint32(offset, value)
+                    ];
                 case 8:
-                    return dataview => dataview.getUint32(offset) << 32 + dataview.getUint32(offset + 4);
+                    return [() => console.log("Uint64_decode"), () => console.log("Uint64_encode")];
+                    return [
+                        dataview => dataview.getUint32(offset) * MAX_INT32 + dataview.getUint32(offset + 4),
+                        (dataview, value) => {
+                            dataview.setUint32(offset, Math.floor(value / MAX_INT32));
+                            dataview.setUint32(offset + 4, value % MAX_INT32);
+                        }
+                    ];
                 default:
-                    return dataview => utils.hex_parser(dataview.buffer, offset, length);
+                    return [() => console.log("Unknown Uint: hex_parser"), () => console.log("Unknown Uint: hex_writer")];
+                    return [
+                        dataview => utils.hex_parser(dataview.buffer, offset, length),
+                        (dataview, value) => utils.hex_writer(dataview.buffer, offset, value)
+                    ];
             }
         case 0b11:  // Float
             switch (length) {
                 case 4:
-                    return dataview => dataview.getFloat32(offset);
+                    return [() => console.log("Float32_decode"), () => console.log("Float32_encode")];
+                    return [
+                        dataview => dataview.getFloat32(offset),
+                        (dataview, value) => dataview.setFloat32(offset, value)
+                    ];
                 case 8:
-                    return dataview => dataview.getFloat64(offset);
+                    return [() => console.log("Float64_decode"), () => console.log("Float64_encode")];
+                    return [
+                        dataview => dataview.getFloat64(offset),
+                        (dataview, value) => dataview.setFloat64(offset, value)
+                    ];
                 default:
-                    return dataview => utils.hex_parser(dataview.buffer, offset, length);
+                    return [() => console.log("Unknown Float: hex_parser"), () => console.log("Unknown Float: hex_writer")];
+                    return [
+                        dataview => utils.hex_parser(dataview.buffer, offset, length),
+                        (dataview, value) => utils.hex_writer(dataview.buffer, offset, value)
+                    ];
             }
         default:
-            return dataview => utils.hex_parser(dataview.buffer, offset, length);
+            return [() => console.log("Unknown type: hex_parser"), () => console.log("Unknown type: hex_writer")];
+            return [
+                dataview => utils.hex_parser(dataview.buffer, offset, length),
+                (dataview, value) => utils.hex_writer(dataview.buffer, offset, value)
+            ];
    }
 }
 
@@ -93,27 +165,47 @@ function parse_admin_report (dataview) {
 
         var report_name_length = dataview.getUint8(report_offset + 3);
 
-        var schema_name = TextDecoder('utf-8').decode(
+        var schema_name = TextDecoder('utf8').decode(
             new Uint8Array(dataview.buffer, report_offset + 4, report_name_length)
         );
 
-        var parser_functions = [];
-
-        for (var mask in report_type_masks) {
-            if (mask & report_types) {
-                schema[report_type_masks[mask]] = {name: schema_name, parsers: parser_functions};
-            }
-        }
+        var decoder_functions = [];
+        var encoder_functions = [];
 
         var data_byte_offset = 0;    // Byte offset for data to be parsed.
-        for (var i = 4 + report_offset + report_name_length + 1; i < report_offset + report_length; ++i) {
+        for (var i = 4 + report_offset + report_name_length; i < report_offset + report_length; ++i) {
             var byte = dataview.getUint8(i);
             var data_type = 0b11 & byte;
             var data_length = byte >> 2;
 
-            parser_functions.push(get_parser(data_type, data_byte_offset, data_length));
+            var [decoder, encoder] = get_encoders_decoders(data_type, data_byte_offset, data_length);
+            decoder_functions.push(decoder);
+            encoder_functions.push(encoder);
 
             data_byte_offset += data_length;
+        }
+        // Now data_byte_offset has a value of the total byte length for the specified report.
+
+        // Wrap the encoder/decoder functions in another function to avoid leaky scopes.
+        var decode = (functions => {
+            return function (dataview) {
+                return functions.forEach(func => func.call(null, dataview));
+            }
+        })(decoder_functions);
+
+        // Wrap the encoder/decoder functions in another function to avoid leaky scopes.
+        var encode = ((functions, byte_length) => {
+            return function (...args) {
+                let buffer = new ArrayBuffer(byte_length);
+                let dataview = new DataView(buffer);
+                functions.forEach((func, index) => func.call(null, dataview, args[index]))
+            }
+        })(encoder_functions, data_byte_offset);
+
+        for (var mask in report_type_masks) {
+            if (mask & report_types) {
+                schema[report_type_masks[mask]] = {name: schema_name, decode: decode, encode: encode};
+            }
         }
 
         report_schemas[report_ID] = schema;
@@ -123,6 +215,7 @@ function parse_admin_report (dataview) {
 
     return report_schemas;
 }
+window.parse_admin_report = parse_admin_report;
 
 
 function build_reports (connection_ID) {

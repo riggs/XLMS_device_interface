@@ -7,6 +7,7 @@
 var kurento = require("./kurento.js");
 var DI = require("./DI.js");
 var XLMS = require("./XLMS.js");
+var device = require("./device.js");
 
 
 var API = module.exports = {};
