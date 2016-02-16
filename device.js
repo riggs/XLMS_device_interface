@@ -146,6 +146,22 @@ function get_encoders_decoders (type, offset, length) {
 }
 
 
+function build_decoder_function (functions) => {
+    return function (dataview) {
+        return functions.forEach(func => func.call(null, dataview));
+    }
+}
+
+
+function build_encoder_function (functions, byte_length) {
+    return function (...args) {
+        let buffer = new ArrayBuffer(byte_length);
+        let dataview = new DataView(buffer);
+        functions.forEach((func, index) => func.call(null, dataview, args[index]))
+    }
+}
+
+
 function parse_admin_report (dataview) {
 
     var buffer_length = dataview.byteLength;
@@ -186,25 +202,13 @@ function parse_admin_report (dataview) {
         }
         // Now data_byte_offset has a value of the total byte length for the specified report.
 
-        // Wrap the encoder/decoder functions in another function to avoid leaky scopes.
-        var decode = (functions => {
-            return function (dataview) {
-                return functions.forEach(func => func.call(null, dataview));
-            }
-        })(decoder_functions);
-
-        // Wrap the encoder/decoder functions in another function to avoid leaky scopes.
-        var encode = ((functions, byte_length) => {
-            return function (...args) {
-                let buffer = new ArrayBuffer(byte_length);
-                let dataview = new DataView(buffer);
-                functions.forEach((func, index) => func.call(null, dataview, args[index]))
-            }
-        })(encoder_functions, data_byte_offset);
-
         for (var mask in report_type_masks) {
             if (mask & report_types) {
-                schema[report_type_masks[mask]] = {name: schema_name, decode: decode, encode: encode};
+                schema[report_type_masks[mask]] = {
+                    name: schema_name,
+                    decode: build_decoder_function(decoder_functions),
+                    encode: build_encoder_function(encoder_functions, data_byte_offset)
+                };
             }
         }
 
