@@ -14,6 +14,7 @@ API.hex_parser = function (buffer, byteOffset, length) {
         .toString();
 };
 
+
 API.hex_writer = function (buffer, byteOffset, values) {
     (new Uint8Array(buffer, byteOffset)).set(values);
 };

@@ -10,7 +10,8 @@ var XLMS = require("./XLMS.js");
 var device = require("./device.js");
 
 
-var API = module.exports = {};
+var API = {};
+module.exports = API;
 
 
 var UI = API.UI = {
@@ -57,43 +58,57 @@ API.Error_Window = function (message, callbacks) {
 };
 
 
-API.init = function (session_data) {
+function generate_webview_message_handler (other_window, other_window_origin) {
+    return message => {
+        switch (message.data.name) {
+            case "ready":
+                API.enable(UI.start_button);
+                break;
+            case "error":
+                /* Error messages usage:
 
-    function generate_message_handler (other_window, other_window_origin) {
-        return message => {
-            switch (message.data.name) {
-                case "ready":
-                    API.enable(UI.start_button);
-                    break;
-                case "error":
-                    let error_types = {
-                        retry: null,
-                        ignore: null,
-                        exit: null
-                    };
-                    message.data.types.forEach(type => {
-                        if (error_types[type] === null) {
-                            error_types[type] = () => {
-                                other_window.postMessage({
-                                    name: "error_response",
-                                    id: message.data.id,
-                                    error_type: type
-                                }, other_window_origin);
-                            }
+                 window.addEventListener('message', message => {
+                     wrapper_window = message.source;
+                     wrapper_window.postMessage({
+                         name: "error",
+                         id: opaque_ID_created_by_plugin_UI,
+                         message: "This is the error message that will be displayed to the user.",
+                         // Up to three options will be presented to the user: retry, ignore, exit
+                         // Indicate which are allowed for a given error by including them in the types array.
+                         types: ["retry", "ignore", "exit"]
+                     }, wrapper_window_origin);     // Chrome App's origin; see DI.js
+                 });
+                 */
+                let error_types = {
+                    retry: null,
+                    ignore: null,
+                    exit: null
+                };
+                message.data.types.forEach(type => {
+                    if (error_types[type] === null) {
+                        error_types[type] = function () {
+                            other_window.postMessage({
+                                name: "error_response",
+                                id: message.data.id,
+                                error_type: type
+                            }, other_window_origin);
                         }
-                    });
-                    API.Error_Window(message.data.message, error_types);
-                    break;
-                case "results":
-                    session_data.results = message.data.results;
-                    XLMS.send_results(message.data.results);
-                    break;
-                default:
-                    console.log("Unknown message:");
-                    console.log(message);
-            }
-        };
-    }
+                    }
+                });
+                API.Error_Window(message.data.message, error_types);
+                break;
+            case "results":
+                XLMS.send_results(message.data.results);
+                break;
+            default:
+                console.log("Unknown message:");
+                console.log(message);
+        }
+    };
+};
+
+
+API.init = function (session_data) {
 
     for (var ID in UI) {
         var element = document.getElementById(ID);
@@ -113,10 +128,10 @@ API.init = function (session_data) {
     UI.interface_webview.addEventListener('loadstop', () => {
         var webview_window = UI.interface_webview.contentWindow;
 
-        window.addEventListener('message', generate_message_handler(webview_window, webview_origin));
+        window.addEventListener('message', generate_webview_message_handler(webview_window, webview_origin));
 
         console.log(Date.now() + "sending session data to webview");
-        webview_window.postMessage({name: "session", value: session_data}, webview_origin);    // FIXME: Figure out what to do about targetOrigin.
+        webview_window.postMessage({name: "session", value: session_data}, webview_origin);
 
         UI.start_button.addEventListener('click', () => {
             webview_window.postMessage({name: "start_exercise"}, webview_origin);
