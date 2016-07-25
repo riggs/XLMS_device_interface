@@ -4,7 +4,7 @@
 "use strict";
 
 
-chrome.app.runtime.onLaunched.addListener(launch_data => {
+chrome.app.runtime.onLaunched.addListener((launch_data) => {
     /*
     if (!launch_data.url) {
         console.log("Error: Unknown session");
@@ -27,7 +27,7 @@ chrome.app.runtime.onLaunched.addListener(launch_data => {
                 id: "interface",
                 'outerBounds': {'width': 680, 'height': 480}
             },
-            created_window => {
+            (created_window) => {
                 created_window.contentWindow.launch_url = launch_data.url;
             }
         );

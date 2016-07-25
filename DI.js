@@ -3,14 +3,8 @@
  */
 "use strict";
 
-var DI = {
+export const app_targetOrigin = "chrome-extension://fpfmfigelfacjdeonglpnkgbilpbopdi";
 
-    app_targetOrigin: "chrome-extension://fpfmfigelfacjdeonglpnkgbilpbopdi",
+export const REST_query_parameter = "endpoint";
 
-    REST_query_parameter: "endpoint",
-
-    admin_report_ID: 1,
-
-};
-
-module.exports = DI;
+export const admin_report_id = 1;

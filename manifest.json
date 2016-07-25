@@ -13,6 +13,9 @@
   },
   "permissions": [
     "hid",
+    {"usbDevices": [
+      {"vendorId": 1003, "productId": 8256}
+    ]},
     "storage",
     "http://xlms.org/",
     "webview",

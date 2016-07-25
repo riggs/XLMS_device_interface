@@ -226,16 +226,6 @@ function parse_admin_report(buffer) {
 window.report_schemas = report_schemas;
 
 
-let magic_buffer = new Uint8Array(
-  [
-    14,   1,   4,   5,  97, 100, 109, 105, 110,   5,   5,   5,   5,  20,  // admin
-    14,   4,  12,   9, 116, 105, 109, 101, 115, 116,  97, 109, 112,  34,  // timestamp
-    12,   5,  12,   7, 116, 105, 109, 101, 111, 117, 116,  18,            // timeout
-    12,   6,   3,   6, 101, 118, 101, 110, 116, 115,  34,   5,            // events
-    12,   7,   1,   6, 101, 114, 114, 111, 114, 115,  34,  18,            // errors
-  ]).buffer;
-
-
 export default (cb) => {
 
   chrome.hid.getDevices({filters: []}, (devices) => {
@@ -249,16 +239,12 @@ export default (cb) => {
     chrome.hid.connect(device_id, (connection) => {
       connection_id = connection.connectionId;
 
-      /*
-      chrome.hid.receiveFeatureReport(connection_id, admin_report_id, (data) => {
+      // Admin report on ID 1
+      chrome.hid.receiveFeatureReport(connection_id, 1, (data) => {
         console.log(utils.hex_parser(data));
-        parse_admin_report(data);
+        parse_admin_report(data.slice(1));
         cb.call();
       });
-      */
-
-      parse_admin_report(magic_buffer);
-      cb.call();
     });
   });
 }
@@ -291,7 +277,7 @@ export function send(report_name, ...data) {
 
 export function receive(cb) {
   return chrome.hid.receive(connection_id, (report_id, data) => {
-    cb(report_schemas[report_id][INPUT_REPORT].name,
-      report_schemas[report_id][INPUT_REPORT].decode(data))
+    let {name, decode} = report_schemas[report_id][INPUT_REPORT];
+    cb(name, decode(data))
   });
 }

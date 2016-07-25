@@ -4,14 +4,14 @@
 "use strict";
 
 
-require("webrtc-adapter-test");
+import "webrtc-adapter-test";
 
 
-var file_uri = null;
-var ws_uri = null;
-var stream = null;
-var recording = false;
-var video = null;
+let file_uri = null;
+let ws_uri = null;
+let stream = null;
+let recording = false;
+let video = null;
 
 
 function start_recording() {
@@ -39,7 +39,7 @@ window.addEventListener('load', () => {
 
     window.addEventListener('message', message => {
         console.log(message);
-        var other_window = message.source;
+        let other_window = message.source;
         switch (message.data.name) {
 
             case "URIs":

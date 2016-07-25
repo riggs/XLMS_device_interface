@@ -4,22 +4,20 @@
 "use strict";
 
 
-var API = {};
-module.exports = API;
+export let kurento = {};
 
-
-API.create_window = function (UI) {
-    console.log("creating wrapper: " + Date.now());
-    chrome.app.window.create(
-        'kurento_wrapper.html',
-        {
-            id: 'kurento',
-            'outerBounds': {'width': 640, 'height': 540}
-        },
-        wrapper => {
-            wrapper.contentWindow.main_window = chrome.app.window.current();
-            wrapper.contentWindow.UI = UI;
-            wrapper.contentWindow.API = API;
-        }
-    )
+kurento.create_window = function (UI) {
+  console.log("creating wrapper: " + Date.now());
+  chrome.app.window.create(
+    'kurento_wrapper.html',
+    {
+      id: 'kurento',
+      'outerBounds': {'width': 640, 'height': 540}
+    },
+    wrapper => {
+      wrapper.contentWindow.main_window = chrome.app.window.current();
+      wrapper.contentWindow.UI = UI;
+      wrapper.contentWindow.kurento = kurento;
+    }
+  )
 };

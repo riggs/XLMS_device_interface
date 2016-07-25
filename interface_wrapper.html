@@ -6,7 +6,7 @@
 
   <title>XLMS Device Interface</title>
 
-  <script type="text/javascript" src="build/interface_wrapper.js"></script>
+  <script type="text/javascript" src="build/interface_bundle.js"></script>
 
 </head>
 <body>
@@ -16,17 +16,13 @@
 </header>
 
 <webview id="interface_webview" class="no_margin" src="GUI_webview_placeholder.html"
-         style="height:600px; width:600px" autosize="on" minheight="540" minwidth="480" partition="GUI"></webview>
+         style="height:800px; width:600px" autosize="on" partition="GUI"></webview>
 
 <div id="buttons">
   <button class="button" id="start_button" disabled>Start Exercise</button>
   <button class="button" id="end_button" disabled>End Exercise</button>
   <button class="button" id="close_button">Return to XLMS</button>
 </div>
-
-<footer>
-  Developed by CREST &copy; 2016.
-</footer>
 
 </body>
 </html>

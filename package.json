@@ -12,9 +12,31 @@
     "urijs": "^1.17.0",
     "webrtc-adapter-test": "^0.2.7"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-preset-es2015": "^6.9.0",
+    "babelify": "^7.3.0"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "es2015"
+          ]
+        }
+      ]
+    ]
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify interface_wrapper.js -o build/interface_bundle.js && browserify kurento_webview.js -o build/kurento_webview.js && browserify kurento_wrapper.js -o build/kurento_wrapper.js"
   },
   "repository": {
     "type": "git",
